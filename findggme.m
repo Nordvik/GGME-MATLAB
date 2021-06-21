@@ -30,7 +30,7 @@ function [ c_out W_opt g_opt yalmip_output] = findggme(g_in, N, only_partial_kno
       else
         [ c1, W1, g1 ] = hyllus44(g_in,N);
       end
-        [ c2, W2, g2 ] = findOptimalCM(W1,N);
+        [ c2, W2, g2 ] = findOptimalCM(W1);
         [ c2, W2, yalmip_output ] = findOptimalWitness_3modes(g2,N);
   elseif N == 4 % T-shaped graph currently
       if only_partial_knowledge
