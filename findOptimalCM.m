@@ -119,10 +119,10 @@ function [ value, witness, state ] = findOptimalCM (W)
    
   
  %-----------------------------------------------------------------------%
- % Minimise using the preferred solver: mosek or sedumi
+ % Minimise using the preferred solver: mosek or SEDUMI
  %-----------------------------------------------------------------------%
  
-  O = sdpsettings('solver', 'sedumi', 'verbose', 1, 'debug', 0);
+  O = sdpsettings('solver', 'mosek', 'verbose', 1, 'debug', 0);
   S = optimize(F, X, O);
  
   

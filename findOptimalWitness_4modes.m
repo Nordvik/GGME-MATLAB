@@ -202,7 +202,7 @@ function [ witvalue, witmatrix, state ] = findOptimalWitness_4modes (G, N)
   
   % Minimize using the MOSEK solver.
   
-  O = sdpsettings('solver', 'sedumi', 'verbose', 0, 'debug', 0);
+  O = sdpsettings('solver', 'mosek', 'verbose', 0, 'debug', 0);
   S = optimize(F, X, O);
   
   % Yield the information.
