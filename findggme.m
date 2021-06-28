@@ -35,12 +35,11 @@ function [ c_out, W_opt, g_opt, yalmip_output] = findggme(g_in, N, only_partial_
       fprintf('~~ Run Number: %d ~~\r', trials - it); 
       fprintf('~~~~~~~~~~~~~~~~~~~~\r\r\r');
 
+
           [ c2, W2, g2 ] = findOptimalCM(W2);
           % Get optimal witness for the cm
           [ c2, W2, yalmip_output ] = findOptimalWitness(g2,N,blindfold);
    end
-  
-  
   
   c_out = c2;
   W_opt = W2;
