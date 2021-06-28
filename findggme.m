@@ -1,21 +1,17 @@
 % Run step one and two in one go
-function [ c_out W_opt g_opt yalmip_output] = findggme(g_in, N, only_partial_knowledge,trials)
+function [ c_out, W_opt, g_opt, yalmip_output] = findggme(g_in, N, only_partial_knowledge, trials, blindfold)
 
   if nargin < 4
-      % One run of the program only
+      % One run of the program only ??
       trials = 1;
       if nargin < 3
-          % Use the extra constraints on the Witness 
-          % unless specified otherwise
+          % Use the extra constraints on the Witness ??
+          % unless specified otherwise               ??
           only_partial_knowledge = true;
       end
   end
   
-  only_partial_knowledge = logical(only_partial_knowledge);
-  
-  if not((N == 3)||(N == 4) )
-    error('Three or four modes expected!')
-  end
+  only_partial_knowledge = logical(only_partial_knowledge);   %??
   
   it = trials;
   it = it - 1;
@@ -24,25 +20,13 @@ function [ c_out W_opt g_opt yalmip_output] = findggme(g_in, N, only_partial_kno
   fprintf('~~ Run Number: %d ~~\r', trials - it); 
   fprintf('~~~~~~~~~~~~~~~~~~~~\r\r\r'); 
   
-  if N == 3
       if only_partial_knowledge
-        [ c1, W1, g1 ] = findOptimalWitness_3modes(g_in,N);
+        [ c1, W1, g1 ] = findOptimalWitness(g_in,N, blindfold);
       else
-        [ c1, W1, g1 ] = hyllus44(g_in,N);
+        [ c1, W1, g1 ] = hyllus44(g_in,N); 
       end
-        [ c2, W2, g2 ] = findOptimalCM(W1,N);
-        [ c2, W2, yalmip_output ] = findOptimalWitness_3modes(g2,N);
-  elseif N == 4 % T-shaped graph currently
-      if only_partial_knowledge
-        [ c1, W1, g1 ] = findOptimalWitness_4modes(g_in,N);
-      else
-        [ c1, W1, g1 ] = hyllus44(g_in,N);
-      end
-        [ c2, W2, g2 ] = findOptimalCM(W1);
-        [ c2, W2, yalmip_output ] = findOptimalWitness_4modes(g2,N);
-  end
-
-
+      [ c2, W2, g2 ] = findOptimalCM(W1);
+      [ c2, W2, yalmip_output ] = findOptimalWitness(g2,N, blindfold);
 
 
   while (it > 0)
@@ -50,26 +34,11 @@ function [ c_out W_opt g_opt yalmip_output] = findggme(g_in, N, only_partial_kno
       fprintf('\r\r~~~~~~~~~~~~~~~~~~~~\r'); 
       fprintf('~~ Run Number: %d ~~\r', trials - it); 
       fprintf('~~~~~~~~~~~~~~~~~~~~\r\r\r');
-      if N == 3
-          if only_partial_knowledge
-            [ c2, W2, g2 ] = findOptimalWitness_3modes(g2,N);
-          else
-            [ c2, W2, g2 ] = hyllus44(g2,N);
-          end
-            [ c2, W2, g2 ] = findOptimalCM(W2,N);
-            % Get optimal witness for the cm
-            [ c2, W2, yalmip_output ] = findOptimalWitness_3modes(g2,N);
-      elseif N == 4
-            elseif N == 4 % T-shaped graph currently
-          if only_partial_knowledge
-            [ c2, W2, g2 ] = findOptimalWitness_4modes(g2,N);
-          else
-            [ c2, W2, g2 ] = hyllus44(g2,N);
-          end
-            [ c2, W2, g2 ] = findOptimalCM(W2);
-            [ c2, W2, yalmip_output ] = findOptimalWitness_4modes(g2,N);
-      end
-  end
+
+          [ c2, W2, g2 ] = findOptimalCM(W2);
+          % Get optimal witness for the cm
+          [ c2, W2, yalmip_output ] = findOptimalWitness(g2,N,blindfold);
+   end
   
   
   

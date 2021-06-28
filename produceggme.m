@@ -7,9 +7,19 @@ function [carray warray garray] = produceggme(instancesWanted,modesWanted)
     
     carray = [];warray = []; garray = [];count=0;
     
-    % Only look at the tripartite case 
     N = modesWanted;
     S = symplecticform(N);
+    
+    %*Use additional constraints on witness*
+    only_partial_knowlege = true;
+    
+    if only_partial_knowlege
+        %Get blindness tree from user and generate blindness condition on
+        %witness
+        blindfold=getBlindness(N);
+    else
+        blindfold=1;
+    end
     
     % Fill in the arrays with the covariance matrices, witnesses and
     % expectation values. 
@@ -28,7 +38,7 @@ function [carray warray garray] = produceggme(instancesWanted,modesWanted)
         round(randomCM*S*randomCM'-S,10);
         
         if (round(randomCM*S*randomCM'-S,10) == zeros(2*N))
-            [c W gamma status] = findggme(randomCM,N,1,5);
+            [c, W, gamma, status] = findggme(randomCM, N, only_partial_knowlege, 5, blindfold);
         end
         
         % Choose error-free runs and those CM's that are linked to an

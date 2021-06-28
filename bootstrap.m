@@ -1,13 +1,13 @@
 function bootstrap
   
   % GENERIC SOLVER INTERFACE
-  addpath(genpath('../lib/yalmip'))
+  addpath(genpath('C:\Users\adamj\OneDrive\Desktop\lib\YALMIP-master'))
   
   % SOLVER: SEDUMI
   addpath(genpath('../lib/sedumi'))
   
   % SOLVER: MOSEK
-  addpath(genpath('../lib/Mosek/8/toolbox/r2014a'))
+  addpath(genpath('C:\Users\adamj\OneDrive\Desktop\lib\Mosek'))
   
 % Some notes:
 %
