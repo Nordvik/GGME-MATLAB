@@ -2,6 +2,7 @@
 function [ c_out, W_opt, g_opt, yalmip_output] = findggme(g, N, only_partial_knowledge, trials, blindfold)
 
   it = trials;
+  trialsArray = [];   %for checking optimal trials
   
   while (it > 0)
       it = it - 1;
@@ -17,9 +18,13 @@ function [ c_out, W_opt, g_opt, yalmip_output] = findggme(g, N, only_partial_kno
       [ ~, ~, g ] = findOptimalCM(W);
       [ c, W, yalmip_output ] = findOptimalWitness(g,N, blindfold);
       
+      %investigate optimal trials
+      trialsArray = cat(2,trialsArray,[trials-it; c]);
+     
+      
   end
-
-
+ trialsArray = cat(2,trialsArray,[repelem(NaN,30-length(trialsArray));repelem(NaN,30-length(trialsArray))]);
+ writematrix(trialsArray,strcat('OutputMatrices\optimalTrials\',string(N),'modes.xls'),'WriteMode','append');
   
   c_out = c;
   W_opt = W;
