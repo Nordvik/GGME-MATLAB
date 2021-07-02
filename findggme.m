@@ -11,12 +11,11 @@ function [ c_out, W_opt, g_opt, yalmip_output] = findggme(g, N, only_partial_kno
       fprintf('~~~~~~~~~~~~~~~~~~~~\r\r\r'); 
   
       if only_partial_knowledge
-        [ ~, W, ~ ] = findOptimalWitness(g,N, blindfold);
+        [ ~, W, yalmip_output ] = findOptimalWitness(g,N, blindfold);
       else
         [ ~, W, ~ ] = hyllus44(g,N); 
       end
-      [ ~, ~, g ] = findOptimalCM(W);
-      [ c, W, yalmip_output ] = findOptimalWitness(g,N, blindfold);
+      [ c, W, g ] = findOptimalCM(W);
       
       %investigate optimal trials
       trialsArray = cat(2,trialsArray,[trials-it; c]);

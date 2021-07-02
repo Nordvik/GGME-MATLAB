@@ -3,6 +3,8 @@ function  [carray, warray, garray, seedarray] = outputggme(instancesWanted,modes
 
 [carray, warray, garray, seedarray] = produceggme(instancesWanted,modesWanted,trials);
     N = modesWanted;
+    time=datestr(datetime, 'dd-mmmm-yyyy HH.MM.ss');
+    
     %format for printing
     
     %All matrices must have same number of columns for output. Pad to make
@@ -32,6 +34,10 @@ function  [carray, warray, garray, seedarray] = outputggme(instancesWanted,modes
     seedString=horpad;
     seedString(1)="Random seeds";
     
+    %for writing to optimalTrials file
+    trialsString = repelem("",30);
+    trialsString(1)= strcat("last ",string(instancesWanted)," instances in ",time);
+    
     %create list of c values to be output with relevant witness and CM
     clist=horpad;
     for i=1:length(carray)
@@ -46,7 +52,6 @@ function  [carray, warray, garray, seedarray] = outputggme(instancesWanted,modes
     %pad seeds
     seedarray = cat(2,seedarray,verpad3d);
     
-    time=datestr(datetime, 'dd-mmmm-yyyy HH.MM.ss');
     
     %Print data to output file
     writematrix(witString,strcat('OutputMatrices\',string(N),'modes\',time,'.xls'),'WriteMode','append');
@@ -60,6 +65,9 @@ function  [carray, warray, garray, seedarray] = outputggme(instancesWanted,modes
     
     writematrix(seedString,strcat('OutputMatrices\',string(N),'modes\',time,'.xls'),'WriteMode','append');
     writematrix(seedarray,strcat('OutputMatrices\',string(N),'modes\',time,'.xls'),'WriteMode','append');
+    
+    %write timestamp and number of instances to optimalTrials file
+    writematrix(trialsString,strcat('OutputMatrices\optimalTrials\',string(N),'modes.xls'),'WriteMode','append');
     
 end
 
