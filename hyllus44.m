@@ -137,8 +137,8 @@ function [ value, witness, state ] = hyllus44 (G, N)
       
   % Minimize using the SEDUMI solver.
   
-  % O = sdpsettings('solver', 'mosek', 'verbose', 0, 'debug', 0);
-  O = sdpsettings('solver', 'sedumi', 'verbose', 0, 'debug', 0);
+   O = sdpsettings('solver', 'mosek', 'verbose', 0, 'debug', 0);
+ % O = sdpsettings('solver', 'sedumi', 'verbose', 0, 'debug', 0);
   S = optimize(F, X, O);
   
   % Yield the information.

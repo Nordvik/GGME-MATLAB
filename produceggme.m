@@ -1,6 +1,11 @@
-function [carray warray garray] = produceggme(instancesWanted,modesWanted)
+function [carray, warray, garray, seedarray] = produceggme(instancesWanted,modesWanted,trials)
   
     bootstrap;
+    
+    % Set trials if unset
+    if nargin<3
+        trials=1;
+    end
     
     % Number of examples wanted
     it = instancesWanted;
@@ -10,7 +15,7 @@ function [carray warray garray] = produceggme(instancesWanted,modesWanted)
     N = modesWanted;
     S = symplecticform(N);
     
-    %*Use additional constraints on witness*
+    %Use additional constraints on witness
     only_partial_knowlege = true;
     
     if only_partial_knowlege
@@ -29,7 +34,7 @@ function [carray warray garray] = produceggme(instancesWanted,modesWanted)
         % it then please let me know. 
         lastwarn("");
 
-        randomCM = rndgaussiancmnoxpcorrelations(N);
+        randomCM = rndgaussiancmnoxpcorrelations(N); %save this for reference (output it)
         
         % Check that the produced CM is symplectic, up to numerical error.
         % We will probably not want results that are sensitive to any
@@ -38,7 +43,7 @@ function [carray warray garray] = produceggme(instancesWanted,modesWanted)
         round(randomCM*S*randomCM'-S,10);
         
         if (round(randomCM*S*randomCM'-S,10) == zeros(2*N))
-            [c, W, gamma, status] = findggme(randomCM, N, only_partial_knowlege, 5, blindfold);
+            [c, W, gamma, status] = findggme(randomCM, N, only_partial_knowlege, trials, blindfold); %automate trials
         end
         
         % Choose error-free runs and those CM's that are linked to an
@@ -46,18 +51,21 @@ function [carray warray garray] = produceggme(instancesWanted,modesWanted)
         % are cases when there are error warnings but the (cm, witness)
         % pair satisfies our requirements. 
 %         if (lastwarn == "" && c < 0)
+status.problem
         if (status.problem == 0 && c < 0)
            it = it - 1;
-           if (length(carray) == 0) % first spotting
+           if isempty(carray) % first spotting
                carray = c;
                warray = W;
                garray = gamma;
+               seedarray = randomCM;
                count = 1;
            else
                count = count + 1;
                carray = [carray, c];
                warray = cat(3,warray,W);
                garray = cat(3,garray,gamma); 
+               seedarray = cat(3,seedarray,randomCM);
            end
         end
     end
