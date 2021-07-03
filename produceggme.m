@@ -1,6 +1,7 @@
-function [carray, warray, garray, seedarray] = produceggme(instancesWanted,modesWanted,trials)
+function [carray, warray, garray, seedarray] = produceggme(instancesWanted,modesWanted,trials,maxTrials)
   
     bootstrap;
+
     
     % Set trials if unset
     if nargin<3
@@ -43,7 +44,7 @@ function [carray, warray, garray, seedarray] = produceggme(instancesWanted,modes
         round(randomCM*S*randomCM'-S,10);
         
         if (round(randomCM*S*randomCM'-S,10) == zeros(2*N))
-            [c, W, gamma, status] = findggme(randomCM, N, only_partial_knowlege, trials, blindfold); %automate trials
+            [c, W, gamma, status] = findggme(randomCM, N, only_partial_knowlege, trials, blindfold, maxTrials); %automate trials
         end
         
         % Choose error-free runs and those CM's that are linked to an

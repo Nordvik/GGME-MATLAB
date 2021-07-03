@@ -1,7 +1,10 @@
 function  [carray, warray, garray, seedarray] = outputggme(instancesWanted,modesWanted,trials)
 %Run produceggme and output findings to file
+    
+%Set max number of trials (iterations in findggme)
+maxTrials = 50;
 
-[carray, warray, garray, seedarray] = produceggme(instancesWanted,modesWanted,trials);
+[carray, warray, garray, seedarray] = produceggme(instancesWanted,modesWanted,trials,maxTrials);
     N = modesWanted;
     time=datestr(datetime, 'dd-mmmm-yyyy HH.MM.ss');
     
@@ -35,7 +38,7 @@ function  [carray, warray, garray, seedarray] = outputggme(instancesWanted,modes
     seedString(1)="Random seeds";
     
     %for writing to optimalTrials file
-    trialsString = repelem("",30);
+    trialsString = repelem("",maxTrials);
     trialsString(1)= strcat("last ",string(instancesWanted)," instances in ",time);
     
     %create list of c values to be output with relevant witness and CM

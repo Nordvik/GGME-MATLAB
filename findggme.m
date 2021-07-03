@@ -1,5 +1,5 @@
 % Run step one and two in one go
-function [ c_out, W_opt, g_opt, yalmip_output] = findggme(g, N, only_partial_knowledge, trials, blindfold)
+function [ c_out, W_opt, g_opt, yalmip_output] = findggme(g, N, only_partial_knowledge, trials, blindfold, maxTrials)
 
   it = trials;
   trialsArray = [];   %for checking optimal trials
@@ -22,7 +22,7 @@ function [ c_out, W_opt, g_opt, yalmip_output] = findggme(g, N, only_partial_kno
      
       
   end
- trialsArray = cat(2,trialsArray,[repelem(NaN,30-length(trialsArray));repelem(NaN,30-length(trialsArray))]);
+ trialsArray = cat(2,trialsArray,[repelem(NaN,maxTrials-length(trialsArray));repelem(NaN,maxTrials-length(trialsArray))]);
  writematrix(trialsArray,strcat('OutputMatrices\optimalTrials\',string(N),'modes.xls'),'WriteMode','append');
   
   c_out = c;
