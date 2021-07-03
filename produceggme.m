@@ -33,16 +33,13 @@ function [carray, warray, garray, seedarray] = produceggme(instancesWanted,modes
         % The warning messages are used for detecting errors appearing when
         % solving the SDP's. There is probably a better way - if you know
         % it then please let me know. 
-        lastwarn("");
+        lastwarn("");   %sets last warning to empty
 
         randomCM = rndgaussiancmnoxpcorrelations(N); %save this for reference (output it)
         
         % Check that the produced CM is symplectic, up to numerical error.
         % We will probably not want results that are sensitive to any
-        % greater number of decimal places. 
-        c=0;
-        round(randomCM*S*randomCM'-S,10);
-        
+        % greater number of decimal places.  
         if (round(randomCM*S*randomCM'-S,10) == zeros(2*N))
             [c, W, gamma, status] = findggme(randomCM, N, only_partial_knowlege, trials, blindfold, maxTrials); %automate trials
         end
@@ -51,27 +48,34 @@ function [carray, warray, garray, seedarray] = produceggme(instancesWanted,modes
         % entangled state. The first criterion might be too strict as there
         % are cases when there are error warnings but the (cm, witness)
         % pair satisfies our requirements. 
-%         if (lastwarn == "" && c < 0)
-status.problem
-        if (status.problem == 0 && c < 0)
-           it = it - 1;
-           if isempty(carray) % first spotting
-               carray = c;
-               warray = W;
-               garray = gamma;
-               seedarray = randomCM;
-               count = 1;
-           else
-               count = count + 1;
-               carray = [carray, c];
-               warray = cat(3,warray,W);
-               garray = cat(3,garray,gamma); 
-               seedarray = cat(3,seedarray,randomCM);
-           end
+        if (lastwarn == "" && c < 0) %Not sure this technique works. There appear to be at least some
+                                     %cases where there is a warning
+                                     %generated in findggme but still
+                                     %lastwarn == "" (somehow). Better to
+                                     %explictly pass and check the solver
+                                     %statuses to truly exclude runs with
+                                     %errors. Better still, check in
+                                     %findggme and exit if warning.
+                                     
+            if (status.problem == 0 && c < 0)
+                it = it - 1;
+                if isempty(carray) % first spotting
+                    carray = c;
+                    warray = W;
+                    garray = gamma;
+                    seedarray = randomCM;
+                    count = 1;
+                else
+                    count = count + 1;
+                    carray = [carray, c];
+                    warray = cat(3,warray,W);
+                    garray = cat(3,garray,gamma); 
+                    seedarray = cat(3,seedarray,randomCM);
+                end
+            end
         end
     end
 end
-
 
 %%
 %%%--------------------------------------------------------------------%%%

@@ -19,7 +19,7 @@
 % Log: 2019-12-11
 %       Generalised code to the N mode
 
-function [ value, witness, state ] = findOptimalCM (W)
+function [ value, witness, CM, state ] = findOptimalCM (W)
 
   if rem(length(W),2) ~= 0
       disp('Error! Witness should have an even number of rows/columns');
@@ -132,7 +132,8 @@ function [ value, witness, state ] = findOptimalCM (W)
   
   value   = double(X);
   witness = real(double(W));
-  state   = double(G);
+  CM   = double(G);
+  state = S;
   
   % Print out a warning if neccessary. 
   %
