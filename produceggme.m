@@ -57,7 +57,7 @@ function [carray, warray, garray, seedarray] = produceggme(instancesWanted,modes
                                      %errors. Better still, check in
                                      %findggme and exit if warning.
                                      
-            if (status.problem == 0 && c < 0)
+            if (status.problem == 0 && c < 0) %why only checking for problems finding witness?
                 it = it - 1;
                 if isempty(carray) % first spotting
                     carray = c;
