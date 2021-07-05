@@ -76,7 +76,9 @@ function [ c_out, W_opt, g_opt, witness_output] = findggme(g, N, only_partial_kn
   
  %Determine optimal CM-Witness pair from those produced
  
- c(1) = 0; %cannot use first CM as it does not have all two-mode marginals seperable
+ if not(hasSeparableMarginals(g) == [])
+     c(1) = 0; %cannot use first CM if it does not have all two-mode marginals seperable
+ end
  [c_out, index]= min(c);
  W_opt = W(:,:,floor(index/2 + 0.6));
  g_opt = CM(:,:,floor(index/2+1.1));
