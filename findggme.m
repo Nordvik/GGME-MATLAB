@@ -2,6 +2,7 @@
 function [ c_out, W_opt, g_opt, witness_output] = findggme(g, N, only_partial_knowledge, trials, blindfold, maxTrials)
 
   iter = trials;
+  erroroutput = "";
   trialsArray = [];   %for checking optimal trials
   
   %initialise arrays for saving witnesses, CMs and witness means
@@ -24,7 +25,7 @@ function [ c_out, W_opt, g_opt, witness_output] = findggme(g, N, only_partial_kn
       else
         [ ~, W(:,:,count), witness_output ] = hyllus44(CM(:,:,count),N); 
       end
-      
+       
       %Save c value to array for printing to optimalTrials
       trialsArray = cat(2,trialsArray,[0; c(count*2-1)]);
       
@@ -32,6 +33,13 @@ function [ c_out, W_opt, g_opt, witness_output] = findggme(g, N, only_partial_kn
         if round(c(2*count - 1),2) <= -1
             c(2*count - 1) = 0;
         end
+        
+      %Catch potentially fatal error
+      if lastwarn == "Solver complains about bad data (MOSEK)"
+          warning(strcat("Potentially fatal error on trial ", string(trials - iter),", exiting now"))
+          erroroutpput = strcat("Fatal error on trial ", string(trials - iter));
+          break
+      end 
         
        %Get and save CM and witness mean to array 
       [ c(2*count), ~, CM(:,:,count+1), CM_output ] = findOptimalCM(W(:,:,count));
@@ -61,6 +69,13 @@ function [ c_out, W_opt, g_opt, witness_output] = findggme(g, N, only_partial_kn
        if round(c(2*count),2) <= -1
             c(2*count) = 0;
        end
+       
+        %Catch potentially fatal error
+      if lastwarn == "Solver complains about bad data (MOSEK)"
+          warning(strcat("Potentially fatal error on trial ", string(trials - iter),", exiting now"))
+          erroroutpput = strcat("Fatal error on trial ", string(trials - iter));
+          break
+      end 
      
     %  %Exit loop and get new random CM if error
     %  if not(lastwarn == "")
@@ -71,12 +86,19 @@ function [ c_out, W_opt, g_opt, witness_output] = findggme(g, N, only_partial_kn
   
  %write evolution of witness expectation value with number of trials to
  %file
- trialsArray = cat(2,trialsArray,[repelem(NaN,maxTrials-length(trialsArray));repelem(NaN,maxTrials-length(trialsArray))]);
+ trialsArray = cat(2,trialsArray,[repelem(NaN,2*maxTrials-length(trialsArray));repelem(NaN,2*maxTrials-length(trialsArray))]);
  writematrix(trialsArray,strcat('OutputMatrices\optimalTrials\',string(N),'modes.xls'),'WriteMode','append');
-  
+ 
+ %Write error message to file if quitting early
+ if not(erroroutput == "")
+     errorString = repelem("",2*maxTrials);
+     errorString(1)= erroroutput;
+     writematrix(errorString,strcat('OutputMatrices\optimalTrials\',string(N),'modes.xls'),'WriteMode','append');
+ end
+ 
  %Determine optimal CM-Witness pair from those produced
  
- if not(hasSeparableMarginals(g) == [])
+ if not(isempty(hasSeparableMarginals(g)))
      c(1) = 0; %cannot use first CM if it does not have all two-mode marginals seperable
  end
  [c_out, index]= min(c);

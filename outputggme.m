@@ -38,7 +38,7 @@ maxTrials = 50;
     seedString(1)="Random seeds";
     
     %for writing to optimalTrials file
-    trialsString = repelem("",maxTrials);
+    trialsString = repelem("",2*maxTrials);
     trialsString(1)= strcat("last ",string(instancesWanted)," instances in ",time);
     
     %create list of c values to be output with relevant witness and CM
