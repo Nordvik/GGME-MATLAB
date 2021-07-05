@@ -1,5 +1,5 @@
 % Run step one and two in one go
-function [ c_out, W_opt, g_opt, witness_output] = findggme(g, N, only_partial_knowledge, trials, blindfold, maxTrials)
+function [ c_out, W_opt, g_opt, witness_output] = findggme(g, N, only_partial_knowledge, trials, blindfold, tree, maxTrials)
 
   iter = trials;
   erroroutput = "";
@@ -87,13 +87,13 @@ function [ c_out, W_opt, g_opt, witness_output] = findggme(g, N, only_partial_kn
  %write evolution of witness expectation value with number of trials to
  %file
  trialsArray = cat(2,trialsArray,[repelem(NaN,2*maxTrials-length(trialsArray));repelem(NaN,2*maxTrials-length(trialsArray))]);
- writematrix(trialsArray,strcat('OutputMatrices\optimalTrials\',string(N),'modes.xls'),'WriteMode','append');
+ writematrix(trialsArray,strcat('OutputMatrices\optimalTrials\',string(N),'modes','\',tree,'.xls'),'WriteMode','append');
  
  %Write error message to file if quitting early
  if not(erroroutput == "")
      errorString = repelem("",2*maxTrials);
      errorString(1)= erroroutput;
-     writematrix(errorString,strcat('OutputMatrices\optimalTrials\',string(N),'modes.xls'),'WriteMode','append');
+     writematrix(errorString,strcat('OutputMatrices\optimalTrials\',string(N),'modes','\',tree,'.xls'),'WriteMode','append');
  end
  
  %Determine optimal CM-Witness pair from those produced

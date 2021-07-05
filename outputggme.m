@@ -4,7 +4,12 @@ function  [carray, warray, garray, seedarray] = outputggme(instancesWanted,modes
 %Set max number of trials (iterations in findggme)
 maxTrials = 50;
 
-[carray, warray, garray, seedarray] = produceggme(instancesWanted,modesWanted,trials,maxTrials);
+    % Set trials if unset
+    if nargin < 3
+        trials = 1;
+    end
+
+[carray, warray, garray, seedarray, tree] = produceggme(instancesWanted,modesWanted,trials,maxTrials);
     N = modesWanted;
     time=datestr(datetime, 'dd-mmmm-yyyy HH.MM.ss');
     
@@ -57,20 +62,20 @@ maxTrials = 50;
     
     
     %Print data to output file
-    writematrix(witString,strcat('OutputMatrices\',string(N),'modes\',time,'.xls'),'WriteMode','append');
-    writematrix(warray,strcat('OutputMatrices\',string(N),'modes\',time,'.xls'),'WriteMode','append');
+    writematrix(witString,strcat('OutputMatrices\',string(N),'modes\',tree,'\',time,'.xls'),'WriteMode','append');
+    writematrix(warray,strcat('OutputMatrices\',string(N),'modes\',tree,'\',time,'.xls'),'WriteMode','append');
     
-    writematrix(covMatString,strcat('OutputMatrices\',string(N),'modes\',time,'.xls'),'WriteMode','append');
-    writematrix(garray,strcat('OutputMatrices\',string(N),'modes\',time,'.xls'),'WriteMode','append');
+    writematrix(covMatString,strcat('OutputMatrices\',string(N),'modes\',tree,'\',time,'.xls'),'WriteMode','append');
+    writematrix(garray,strcat('OutputMatrices\',string(N),'modes\',tree,'\',time,'.xls'),'WriteMode','append');
     
-    writematrix(meanString,strcat('OutputMatrices\',string(N),'modes\',time,'.xls'),'WriteMode','append');
-    writematrix(clist,strcat('OutputMatrices\',string(N),'modes\',time,'.xls'),'WriteMode','append');
+    writematrix(meanString,strcat('OutputMatrices\',string(N),'modes\',tree,'\',time,'.xls'),'WriteMode','append');
+    writematrix(clist,strcat('OutputMatrices\',string(N),'modes\',tree,'\',time,'.xls'),'WriteMode','append');
     
-    writematrix(seedString,strcat('OutputMatrices\',string(N),'modes\',time,'.xls'),'WriteMode','append');
-    writematrix(seedarray,strcat('OutputMatrices\',string(N),'modes\',time,'.xls'),'WriteMode','append');
+    writematrix(seedString,strcat('OutputMatrices\',string(N),'modes\',tree,'\',time,'.xls'),'WriteMode','append');
+    writematrix(seedarray,strcat('OutputMatrices\',string(N),'modes\',tree,'\',time,'.xls'),'WriteMode','append');
     
     %write timestamp and number of instances to optimalTrials file
-    writematrix(trialsString,strcat('OutputMatrices\optimalTrials\',string(N),'modes.xls'),'WriteMode','append');
+    writematrix(trialsString,strcat('OutputMatrices\optimalTrials\',string(N),'modes','\',tree,'.xls'),'WriteMode','append');
     
 end
 

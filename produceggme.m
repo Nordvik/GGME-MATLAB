@@ -1,31 +1,28 @@
-function [carray, warray, garray, seedarray] = produceggme(instancesWanted,modesWanted,trials,maxTrials)
+function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted,N,trials, maxTrials)
   
     bootstrap;
 
-    
-    % Set trials if unset
-    if nargin<3
-        trials=1;
-    end
-    
-    % Number of examples wanted
-    it = instancesWanted;
-    
-    carray = [];warray = []; garray = [];count=0;
-    
-    N = modesWanted;
-    S = symplecticform(N);
-    
     %Use additional constraints on witness
     only_partial_knowlege = true;
     
     if only_partial_knowlege
         %Get blindness tree from user and generate blindness condition on
         %witness
-        blindfold=getBlindness(N);
+        [blindfold, tree] = getBlindness(N);
     else
-        blindfold=1;
+        blindfold=1;tree=0;
     end
+    
+    
+    % Number of examples wanted
+    it = instancesWanted;
+    
+    carray = [];warray = []; garray = [];count=0;
+
+    S = symplecticform(N);
+    
+    %format tree name for printing
+    tree = strjoin(string(tree));
     
     % Fill in the arrays with the covariance matrices, witnesses and
     % expectation values. 
@@ -41,7 +38,7 @@ function [carray, warray, garray, seedarray] = produceggme(instancesWanted,modes
         % We will probably not want results that are sensitive to any
         % greater number of decimal places.  
         if (round(randomCM*S*randomCM'-S,10) == zeros(2*N))
-            [c, W, gamma, status] = findggme(randomCM, N, only_partial_knowlege, trials, blindfold, maxTrials); %automate trials
+            [c, W, gamma, status] = findggme(randomCM, N, only_partial_knowlege, trials, blindfold, tree, maxTrials); %automate trials
         end
         
         % Choose error-free runs and those CM's that are linked to an
