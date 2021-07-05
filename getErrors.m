@@ -32,7 +32,7 @@ while runs > 0
         writematrix(witString,strcat('OutputMatrices\whyErrors\',string(N),'modes\BadCMs.xls'),'WriteMode','append');
         writematrix(CM,strcat('OutputMatrices\whyErrors\',string(N),'modes\BadCMs.xls'),'WriteMode','append');
     else
-        writematrix(WitString,strcat('OutputMatrices\whyErrors\',string(N),'modes\GoodCMs.xls'),'WriteMode','append');
+        writematrix(witString,strcat('OutputMatrices\whyErrors\',string(N),'modes\GoodCMs.xls'),'WriteMode','append');
         writematrix(CM,strcat('OutputMatrices\whyErrors\',string(N),'modes\GoodCMs.xls'),'WriteMode','append');
     end
     

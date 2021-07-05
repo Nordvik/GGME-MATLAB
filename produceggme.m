@@ -48,16 +48,9 @@ function [carray, warray, garray, seedarray] = produceggme(instancesWanted,modes
         % entangled state. The first criterion might be too strict as there
         % are cases when there are error warnings but the (cm, witness)
         % pair satisfies our requirements. 
-        if (lastwarn == "" && c < 0) %Not sure this technique works. There appear to be at least some
-                                     %cases where there is a warning
-                                     %generated in findggme but still
-                                     %lastwarn == "" (somehow). Better to
-                                     %explictly pass and check the solver
-                                     %statuses to truly exclude runs with
-                                     %errors. Better still, check in
-                                     %findggme and exit if warning.
+  %      if (lastwarn == "" && c < 0) 
                                      
-            if (status.problem == 0 && c < 0) %why only checking for problems finding witness?
+            if ( c < 0) 
                 it = it - 1;
                 if isempty(carray) % first spotting
                     carray = c;
@@ -75,7 +68,7 @@ function [carray, warray, garray, seedarray] = produceggme(instancesWanted,modes
             end
         end
     end
-end
+%end
 
 %%
 %%%--------------------------------------------------------------------%%%
