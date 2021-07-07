@@ -1,14 +1,13 @@
-function blindfold = getBlindness(N)
+function [blindfold, adjList] = getBlindness(N)
 %Takes number of modes as input, requests blindness tree from user and
 %outputs blindness conditions on witness
 
     if N<3 
         error('Expects 3 modes or more.')
     end
-
-
     
     if N==3 %automatically set blindness tree to only option for N=3
+        adjList=[0 1 2];
         adjMat=[1 1 0; 1 1 1; 0 1 1];
         
     else %get blindness tree from user

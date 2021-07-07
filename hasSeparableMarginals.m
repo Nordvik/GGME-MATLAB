@@ -6,7 +6,7 @@ function notSepMarginalsArray = hasSeparableMarginals(A)
 boolDisplayMessages = false;
 
 % checking that dimensions are alright
-[n m] = size(A);
+[n, m] = size(A);
 
 if not(n == m)
     error('Matrix must be square.')
@@ -21,13 +21,12 @@ end
 modes = length(A)/2;
 
 
-%Defining symplectic form of size of marginals (modes - 1)
-omg2 = [0 1; -1 0];
+%Defining symplectic form of size of marginals (modes - 1)???
 % omg = [];
 % for i = 1:(modes-1)
 %     omg = blkdiag(omg, omg2);
 % end
-omg = blkdiag(omg2,omg2);
+omg = symplecticform(2);
 
 
 
@@ -50,20 +49,20 @@ for i = 1:modes
         arrModesToRemove = setdiff(arrModeList,[i,j]); % Remove all but two modes
         submat = RemoveMode(A,arrModesToRemove);
     
-        ppt1 = isPositiveDefinite(L1*submat*transpose(L1) + 1i*omg);
+        ppt1 = isPositiveDefinite(L1*submat*transpose(L1) + 1i*omg);  
         ppt2 = isPositiveDefinite(L2*submat*transpose(L2) + 1i*omg);
         
         if (ppt1 && ppt2)
             if boolDisplayMessages
-                MSG = ['Submatrix when removing mode ',num2str(i), ' is PPT'];
+                MSG = ['Submatrix for modes ',num2str(i), ' and ',num2str(j),' is PPT'];
                 disp(MSG)
             end
         else
             if boolDisplayMessages
-                MSG = ['Submatrix when removing mode ',num2str(i), ' is not PPT'];
+                MSG = ['Submatrix for modes ',num2str(i), ' and ',num2str(j),' is not PPT'];
                 disp(MSG)
             end
-            notSepMarginalsArray = [notSepMarginalsArray,i];
+            notSepMarginalsArray = cat(3,notSepMarginalsArray,[i, j]);
         end
     end
 end
@@ -74,7 +73,15 @@ end
 %%%--------------------------------------------------------------------%%%
 %%%                       Helper Functions                             %%%
 %%%--------------------------------------------------------------------%%%
-    
+
+% Symplectic form in the (x1,p1,x2,p2,...) ordering
+function J = symplecticform(N)
+    J = [ 0 1 ; -1 0 ];
+    for i = 1:N-1
+        J = blkdiag(J, [ 0 1 ; -1 0 ]);
+    end
+end
+
 function x=isPositiveDefinite(A)
 %Function to check whether a given matrix A is positive definite
 %Author Mathuranathan for https://www.gaussianwaves.com

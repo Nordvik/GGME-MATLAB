@@ -1,25 +1,28 @@
-function [carray warray garray] = produceggme(instancesWanted,modesWanted)
+function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted,N,trials, maxTrials)
   
     bootstrap;
-    
-    % Number of examples wanted
-    it = instancesWanted;
-    
-    carray = [];warray = []; garray = [];count=0;
-    
-    N = modesWanted;
-    S = symplecticform(N);
-    
-    %*Use additional constraints on witness*
+
+    %Use additional constraints on witness
     only_partial_knowlege = true;
     
     if only_partial_knowlege
         %Get blindness tree from user and generate blindness condition on
         %witness
-        blindfold=getBlindness(N);
+        [blindfold, tree] = getBlindness(N);
     else
-        blindfold=1;
+        blindfold=1;tree=0;
     end
+    
+    
+    % Number of examples wanted
+    it = instancesWanted;
+    
+    carray = [];warray = []; garray = [];count=0;
+
+    S = symplecticform(N);
+    
+    %format tree name for printing
+    tree = strjoin(string(tree));
     
     % Fill in the arrays with the covariance matrices, witnesses and
     % expectation values. 
@@ -27,42 +30,42 @@ function [carray warray garray] = produceggme(instancesWanted,modesWanted)
         % The warning messages are used for detecting errors appearing when
         % solving the SDP's. There is probably a better way - if you know
         % it then please let me know. 
-        lastwarn("");
+        lastwarn("");   %sets last warning to empty
 
-        randomCM = rndgaussiancmnoxpcorrelations(N);
+        randomCM = rndgaussiancmnoxpcorrelations(N); %save this for reference (output it)
         
         % Check that the produced CM is symplectic, up to numerical error.
         % We will probably not want results that are sensitive to any
-        % greater number of decimal places. 
-        c=0;
-        round(randomCM*S*randomCM'-S,10);
-        
+        % greater number of decimal places.  
         if (round(randomCM*S*randomCM'-S,10) == zeros(2*N))
-            [c, W, gamma, status] = findggme(randomCM, N, only_partial_knowlege, 5, blindfold);
+            [c, W, gamma, status] = findggme(randomCM, N, only_partial_knowlege, trials, blindfold, tree, maxTrials); %automate trials
         end
         
         % Choose error-free runs and those CM's that are linked to an
         % entangled state. The first criterion might be too strict as there
         % are cases when there are error warnings but the (cm, witness)
         % pair satisfies our requirements. 
-%         if (lastwarn == "" && c < 0)
-        if (status.problem == 0 && c < 0)
-           it = it - 1;
-           if (length(carray) == 0) % first spotting
-               carray = c;
-               warray = W;
-               garray = gamma;
-               count = 1;
-           else
-               count = count + 1;
-               carray = [carray, c];
-               warray = cat(3,warray,W);
-               garray = cat(3,garray,gamma); 
-           end
+  %      if (lastwarn == "" && c < 0) 
+                                     
+            if ( c < 0) 
+                it = it - 1;
+                if isempty(carray) % first spotting
+                    carray = c;
+                    warray = W;
+                    garray = gamma;
+                    seedarray = randomCM;
+                    count = 1;
+                else
+                    count = count + 1;
+                    carray = [carray, c];
+                    warray = cat(3,warray,W);
+                    garray = cat(3,garray,gamma); 
+                    seedarray = cat(3,seedarray,randomCM);
+                end
+            end
         end
     end
-end
-
+%end
 
 %%
 %%%--------------------------------------------------------------------%%%
