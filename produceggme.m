@@ -37,7 +37,7 @@ function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted
         % Check that the produced CM is symplectic, up to numerical error.
         % We will probably not want results that are sensitive to any
         % greater number of decimal places.  
-        if (round(randomCM*S*randomCM'-S,10) == zeros(2*N))
+        if (round(randomCM*S*randomCM'-S,20) == zeros(2*N))
             [c, W, gamma, status] = findggme(randomCM, N, only_partial_knowlege, trials, blindfold, tree, maxTrials); %automate trials
         end
         

@@ -26,7 +26,7 @@ function [witvalue, witmatrix, state] = findOptimalWitness(G, N, blindfold)
   % Per (M.52) we have to constrain the structure of the witness. To avoid
   % additional constraints we imprint this onto the actual witness matrix.
   
-    W=W.*blindfold;
+   W=W.*blindfold;
 
 
 %   % Utility matrices (used only locally)

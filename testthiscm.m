@@ -18,7 +18,7 @@ N = length(cm)/2;
 boolRoundSignificant = false;
 
 boolDisplayMessages = true;
-boolDisplayVariables = false;
+boolDisplayVariables = true;
 
 if boolRoundSignificant
 thiscm = round(cm,round_cm,'significant');
@@ -37,7 +37,7 @@ NonSepMargArray = hasSeparableMarginals(thiscm);
 witness_avg = trace(thiscm*thiswit);
 
 % Now test witness: Real and positive semidefinite
-witness_ok = isreal(thiswit)&& isPositiveDefinite(round(thiswit,10)) && (witness_avg - 1 < 0);
+witness_ok = isreal(thiswit)&& all(eig(round(thiswit,10))>=0) && (witness_avg - 1 < 0);
 
 
 Rounding_msg = ['Rounding:  CM = ', num2str(round_cm), '  Wit = ', num2str(round_wit)];
