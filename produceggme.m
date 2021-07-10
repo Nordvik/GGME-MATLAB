@@ -35,9 +35,9 @@ function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted
         randomCM = rndgaussiancmnoxpcorrelations(N); %save this for reference (output it)
         
         % Check that the produced CM is symplectic, up to numerical error.
-        % We will probably not want results that are sensitive to any
-        % greater number of decimal places.  
-        if (round(randomCM*S*randomCM'-S,20) == zeros(2*N))
+        errorlevel = floor(-log10(eps(max(max(randomCM)))));
+         
+        if (round(randomCM*S*randomCM'-S,errorlevel) == zeros(2*N))
             [c, W, gamma, status] = findggme(randomCM, N, only_partial_knowlege, trials, blindfold, tree, maxTrials); %automate trials
         end
         

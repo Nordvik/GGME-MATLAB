@@ -11,7 +11,8 @@ while runs > 0
     check = true;  
     while check
         CM = rndgaussiancmnoxpcorrelations(N);
-        if (round(CM*S*CM'-S,10) == zeros(2*N))
+        errorlevel = floor(-log10(eps(max(max(CM)))));
+        if (round(CM*S*CM'-S,errorlevel) == zeros(2*N))
             check = false;
         end
     end
