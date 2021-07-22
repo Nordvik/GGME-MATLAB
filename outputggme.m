@@ -1,15 +1,15 @@
-function  [carray, warray, garray, seedarray] = outputggme(instancesWanted,modesWanted,trials)
+function  [carray, warray, garray, seedarray] = outputggme(instancesWanted,modesWanted,trials, adjList)
 %Run produceggme and output findings to file
     
 %Set max number of trials (iterations in findggme)
 maxTrials = 50;
 
-    % Set trials if unset
-    if nargin < 3
-        trials = 1;
+    % Set adjList if unset
+    if nargin < 4
+        adjList = [];
     end
 
-[carray, warray, garray, seedarray, tree] = produceggme(instancesWanted,modesWanted,trials,maxTrials);
+[carray, warray, garray, seedarray, tree] = produceggme(instancesWanted,modesWanted,trials,maxTrials,adjList);
     N = modesWanted;
     time=datestr(datetime, 'dd-mmmm-yyyy HH.MM.ss');
     

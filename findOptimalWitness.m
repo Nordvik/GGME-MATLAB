@@ -129,7 +129,7 @@ function [witvalue, witmatrix, state] = findOptimalWitness(G, N, blindfold)
     % Construct the 2nd constraint from (H.44)!
     
     F = [ F, trace(1i * S * Y) + U - V + Z == 0 ];
-    
+        
   end
   
   % Construct the objective, X per (H.44).
@@ -146,9 +146,12 @@ function [witvalue, witmatrix, state] = findOptimalWitness(G, N, blindfold)
   witvalue  = double(X);
   witmatrix = real(double(W));
   state     = S;
+
   
-  % Print out a warning if neccessary?
-  
+  % Check if constraints are met
+  %check(F)
+
+  %Print warning if there is a problem
   if not(S.problem == 0)
     warning(S.info)
   end

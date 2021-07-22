@@ -21,6 +21,8 @@
 
 function [ value, witness, CM, state ] = findOptimalCM (W)
 
+yalmip('clear')
+
   if rem(length(W),2) ~= 0
       disp('Error! Witness should have an even number of rows/columns');
       return

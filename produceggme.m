@@ -1,4 +1,4 @@
-function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted,N,trials, maxTrials)
+function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted,N,trials, maxTrials, adjList)
   
     bootstrap;
 
@@ -8,7 +8,7 @@ function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted
     if only_partial_knowlege
         %Get blindness tree from user and generate blindness condition on
         %witness
-        [blindfold, tree] = getBlindness(N);
+        [blindfold, tree] = getBlindness(N, adjList);
     else
         blindfold=1;tree=0;
     end
@@ -32,22 +32,21 @@ function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted
         % it then please let me know. 
         lastwarn("");   %sets last warning to empty
 
-        randomCM = rndgaussiancmnoxpcorrelations(N); %save this for reference (output it)
-        
-        % Check that the produced CM is symplectic, up to numerical error.
-        errorlevel = floor(-log10(eps(max(max(randomCM)))));
-         
-        if (round(randomCM*S*randomCM'-S,errorlevel) == zeros(2*N))
-            [c, W, gamma, status] = findggme(randomCM, N, only_partial_knowlege, trials, blindfold, tree, maxTrials); %automate trials
+               
+        % Check that the produced CM is a quantum CM, up to numerical error.
+        check = true;
+        while check
+            randomCM = rndgaussiancmnoxpcorrelations(N);
+            if isCM(randomCM)
+                [c, W, gamma, ~] = findggme(randomCM, N, only_partial_knowlege, trials, blindfold, tree, maxTrials); %automate trials
+                check = false;
+            end
         end
         
-        % Choose error-free runs and those CM's that are linked to an
-        % entangled state. The first criterion might be too strict as there
-        % are cases when there are error warnings but the (cm, witness)
-        % pair satisfies our requirements. 
-  %      if (lastwarn == "" && c < 0) 
+        % Choose runs with valid output matrices and are linked to an
+        % entangled state. 
                                      
-            if ( c < 0) 
+            if ( c < 0 && isWitness(W) && isCM(gamma)) %all conditions for a valid output. These could be too strong, as tolerances are very small
                 it = it - 1;
                 if isempty(carray) % first spotting
                     carray = c;
@@ -65,7 +64,7 @@ function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted
             end
         end
     end
-%end
+
 
 %%
 %%%--------------------------------------------------------------------%%%
@@ -78,12 +77,14 @@ function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted
 function cm = rndgaussiancmnoxpcorrelations(N)
 
         T = orderingconversion(N);
-        S = symplecticform(N);
+        %create random diagonal matrix (max element 15)
+        D = diag(randi(15,N,1));
+
         randommatrix = randn(N);
         
         % This gives a covariance matrix in the 
         %(x1,x2,...,p1,p2,...) ordering
-        thismat = blkdiag(randommatrix*eye(N)*randommatrix',(randommatrix')^(-1)*eye(N)*randommatrix^(-1));
+        thismat = blkdiag(randommatrix*D*randommatrix',(randommatrix')^(-1)*D*randommatrix^(-1));
        
         % Convert to the wanted ordering
         cm = T'*thismat*T;

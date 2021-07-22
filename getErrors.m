@@ -18,6 +18,7 @@ while runs > 0
     end
     
     it=trials;
+    eiglist = [];
     
     witString = repelem(" ", trials*2*N);
     CMString = repelem(" ", trials*2*N);
@@ -27,11 +28,14 @@ while runs > 0
         
         [ ~, W(:,:,trials-it+1), witness_output ] = findOptimalWitness(CM(:,:,trials-it+1),N, blindfold);
         [ c(:,:,trials-it+1), ~, CM(:,:,trials-it+2), CM_output ] = findOptimalCM(W(:,:,trials-it+1));
-
+        
+        eiglist = [eiglist, min(eig(W(:,:,trials-it+1)))];
+        
         %prepare for printing
 
         witString(2*N*(trials-it)+1) = witness_output.info;
         witString(2*N*(trials-it)+2) = c(:,:,trials-it+1);
+        witString(2*N*(trials-it)+3) = string(isPSD(W(:,:,trials-it+1)));
         CMString(2*N*(trials-it)+1) = CM_output.info;
         CMString(2*N*(trials-it)+2) = c(:,:,trials-it+1);
         
@@ -47,7 +51,8 @@ while runs > 0
     %print witness
         writematrix(witString,strcat('OutputMatrices\whyErrors\',string(N),'modes\',time,'.xls'),'WriteMode','append');
         writematrix(W,strcat('OutputMatrices\whyErrors\',string(N),'modes\',time,'.xls'),'WriteMode','append');
-    end
+end
+    eiglist
 end
 
 
