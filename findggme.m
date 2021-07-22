@@ -67,7 +67,7 @@ function [ c_out, W_opt, g_opt, witness_output] = findggme(g, N, only_partial_kn
       
       %Exclude from results if c <= -1: there must have been an error
        if round(c(2*count),2) <= -1
-            c(2*count) = 0;
+            c(2*count) = 1;
        end
        
         %Catch potentially fatal error
@@ -101,9 +101,22 @@ function [ c_out, W_opt, g_opt, witness_output] = findggme(g, N, only_partial_kn
  if not(isempty(hasSeparableMarginals(g)))
      c(1) = 0; %cannot use first CM if it does not have all two-mode marginals seperable
  end
+ 
  [c_out, index]= min(c);
- W_opt = W(:,:,floor(index/2 + 0.6));
- g_opt = CM(:,:,floor(index/2+1.1));
+ W_opt = W(:,:,ceil(index/2));
+ g_opt = CM(:,:,floor(index/2+1));
+ 
+ %only select matrices if they are valid
+ while not(isWitness(W_opt) && isCM(g_opt))
+     c(index) = 1;
+     [c_out, index]= min(c);
+     W_opt = W(:,:,ceil(index/2));
+     g_opt = CM(:,:,floor(index/2+1));
+     
+     if c(index) == 1
+         break
+     end
+ end
  
   
 end

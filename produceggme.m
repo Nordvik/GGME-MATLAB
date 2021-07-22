@@ -43,10 +43,10 @@ function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted
             end
         end
         
-        % Choose runs with valid output matrices and are linked to an
+        % Choose runs with valid output matrices and that are linked to an
         % entangled state. 
                                      
-            if ( c < 0 && isWitness(W) && isCM(gamma)) %all conditions for a valid output. These could be too strong, as tolerances are very small
+            if ( c < 0 ) %includes all conditions for a valid output as checked in findggme. These could be too strong, as tolerances are very small
                 it = it - 1;
                 if isempty(carray) % first spotting
                     carray = c;
