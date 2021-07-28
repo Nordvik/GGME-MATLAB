@@ -1,6 +1,6 @@
-function getErrors(runs,N)
-%GETERRORS Generates random matrices and categorises them based on whether
-%they cause findOptimalCM or findOptimalWitness to crash or not
+function getErrors(runs,N, trials)
+%GETERRORS Generates witnesses and covariance matrices and categorises them based on whether
+%there is a warning associated with their production or not
 S = symplecticform(N);
 blindfold = getBlindness(N);
 
@@ -11,42 +11,45 @@ while runs > 0
     check = true;  
     while check
         CM = rndgaussiancmnoxpcorrelations(N);
-        if (round(CM*S*CM'-S,10) == zeros(2*N))
+        errorlevel = floor(-log10(eps(max(max(CM)))));
+        if (round(CM*S*CM'-S,errorlevel) == zeros(2*N))
             check = false;
         end
     end
     
-    [ ~, W1, witness_output ] = findOptimalWitness(CM,N, blindfold);
-    [ c, W2, g, CM_output ] = findOptimalCM(W1);
-
-    %prepare for printing
-    witString = repelem(" ", 2*N);
-    CMString = repelem(" ", 2*N);
-    witString(1) = witness_output.info;
-    witString(2) = c;
-    CMString(1) = CM_output.info;
-    CMString(2) = c;
+    it=trials;
     
-    %print CM
-    if witness_output.problem ~= 0
-        writematrix(witString,strcat('OutputMatrices\whyErrors\',string(N),'modes\BadCMs.xls'),'WriteMode','append');
-        writematrix(CM,strcat('OutputMatrices\whyErrors\',string(N),'modes\BadCMs.xls'),'WriteMode','append');
-    else
-        writematrix(witString,strcat('OutputMatrices\whyErrors\',string(N),'modes\GoodCMs.xls'),'WriteMode','append');
-        writematrix(CM,strcat('OutputMatrices\whyErrors\',string(N),'modes\GoodCMs.xls'),'WriteMode','append');
+    witString = repelem(" ", trials*2*N);
+    CMString = repelem(" ", trials*2*N);
+    W=[];
+    c=[];
+    while it>0
+        
+        [ ~, W(:,:,trials-it+1), witness_output ] = findOptimalWitness(CM(:,:,trials-it+1),N, blindfold);
+        [ c(:,:,trials-it+1), ~, CM(:,:,trials-it+2), CM_output ] = findOptimalCM(W(:,:,trials-it+1));
+
+        %prepare for printing
+
+        witString(2*N*(trials-it)+1) = witness_output.info;
+        witString(2*N*(trials-it)+2) = c(:,:,trials-it+1);
+        CMString(2*N*(trials-it)+1) = CM_output.info;
+        CMString(2*N*(trials-it)+2) = c(:,:,trials-it+1);
+        
+        it=it-1;
     end
+    
+    time=datestr(datetime, 'dd-mmmm-yyyy HH.MM.ss');
+    %print CM
+
+        writematrix(CMString,strcat('OutputMatrices\whyErrors\',string(N),'modes\',time,'.xls'),'WriteMode','append');
+        writematrix(CM,strcat('OutputMatrices\whyErrors\',string(N),'modes\',time,'.xls'),'WriteMode','append');
     
     %print witness
-    if CM_output.problem ~= 0
-        writematrix(CMString,strcat('OutputMatrices\whyErrors\',string(N),'modes\BadWitnesses.xls'),'WriteMode','append');
-        writematrix(CM,strcat('OutputMatrices\whyErrors\',string(N),'modes\BadWitnesses.xls'),'WriteMode','append');
-    else
-        writematrix(CMString,strcat('OutputMatrices\whyErrors\',string(N),'modes\GoodWitnesses.xls'),'WriteMode','append');
-        writematrix(CM,strcat('OutputMatrices\whyErrors\',string(N),'modes\GoodWitnesses.xls'),'WriteMode','append');
+        writematrix(witString,strcat('OutputMatrices\whyErrors\',string(N),'modes\',time,'.xls'),'WriteMode','append');
+        writematrix(W,strcat('OutputMatrices\whyErrors\',string(N),'modes\',time,'.xls'),'WriteMode','append');
     end
-    
 end
-end
+
 
 function cm = rndgaussiancmnoxpcorrelations(N)
 
