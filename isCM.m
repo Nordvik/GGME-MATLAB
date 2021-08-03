@@ -18,7 +18,9 @@ S = symp(N);
 x = isPSD(M + 1i*S);
 
 if not(x)
-    "CM does not satisfy the Heisenberg uncertainty principle."
+    warning("CM does not satisfy the Heisenberg uncertainty principle.")
+else
+    disp("CM is valid.")
 end
 end
 

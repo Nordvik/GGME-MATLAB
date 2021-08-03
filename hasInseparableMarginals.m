@@ -1,12 +1,10 @@
-function notSepMarginalsArray = hasSeparableMarginals(A)
+function notSepMarginalsArray = hasInseparableMarginals(CM)
 % Function to check whether all marginals, of A, are separable 
-%
-% Note: currently only works for 3 modes. 
 
 boolDisplayMessages = false;
 
 % checking that dimensions are alright
-[n, m] = size(A);
+[n, m] = size(CM);
 
 if not(n == m)
     error('Matrix must be square.')
@@ -18,17 +16,9 @@ if not(mod(n,2)==0) %not even
     return;
 end
 
-modes = length(A)/2;
+N = length(CM)/2;
 
-
-%Defining symplectic form of size of marginals (modes - 1)???
-% omg = [];
-% for i = 1:(modes-1)
-%     omg = blkdiag(omg, omg2);
-% end
 omg = symplecticform(2);
-
-
 
 %Defining transposition matrices (p_a -> -p_a)
 sigma_z  = [ 1 0 ; 0 -1]; 
@@ -40,14 +30,14 @@ notSepMarginalsArray = [];
 
 % Cut submatrices and check for positivity
 arrModeList = [];
-for i = 1:modes
+for i = 1:N
     arrModeList(i) = i;
 end
 
-for i = 1:modes
-    for j = i+1:modes
+for i = 1:N
+    for j = i+1:N
         arrModesToRemove = setdiff(arrModeList,[i,j]); % Remove all but two modes
-        submat = RemoveMode(A,arrModesToRemove);
+        submat = RemoveMode(CM,arrModesToRemove);
     
         ppt1 = isPositiveDefinite(L1*submat*transpose(L1) + 1i*omg);  
         ppt2 = isPositiveDefinite(L2*submat*transpose(L2) + 1i*omg);
@@ -97,7 +87,7 @@ function x=isPositiveDefinite(A)
 
     %Check if the matrix is symmetric
     [m,n]=size(A); 
-    if m~=n,
+    if m~=n
         error('A is not Symmetric');
     end
     
@@ -105,7 +95,7 @@ function x=isPositiveDefinite(A)
     x=1; %Flag to check for positiveness
     for i=1:m
         subA=A(1:i,1:i); %Extract upper left kxk submatrix
-        if(det(subA)<=0); %Check if the determinent of the kxk submatrix is +ve
+        if(det(subA)<=0) %Check if the determinent of the kxk submatrix is +ve
             x=0;
             break;
         end

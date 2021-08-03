@@ -19,7 +19,7 @@
 % Log: 2019-12-11
 %       Generalised code to the N mode
 
-function [ value, witness, CM, state ] = findOptimalCM (W)
+function [ c, CM, output] = findOptimalCM (W)
 
 yalmip('clear')
 
@@ -132,10 +132,10 @@ yalmip('clear')
  % Outputs
  %-----------------------------------------------------------------------%
   
-  value   = double(X);
+  c   = double(X);
   witness = real(double(W));
   CM   = double(G);
-  state = S;
+  output = S;
   
   % Print out a warning if neccessary. 
   %

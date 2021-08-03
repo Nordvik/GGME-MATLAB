@@ -1,25 +1,32 @@
-function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted,N,trials, maxTrials, adjList)
+function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted,modesWanted,trials, adjList)
   
     bootstrap;
 
-    %Use additional constraints on witness
-    only_partial_knowlege = true;
+    if nargin <4 %if adjList unset
+        adjList = [];
+    end
     
-    if only_partial_knowlege
+    if nargin < 3 %if trials unset
+        trials = 10; %default value
+    end
+
+    %Use additional constraints on witness
+    only_partial_knowledge = true;
+    
+    if only_partial_knowledge
         %Get blindness tree from user and generate blindness condition on
         %witness
-        [blindfold, tree] = getBlindness(N, adjList);
+        [blindfold, tree] = getBlindness(modesWanted, adjList);
     else
         blindfold=1;tree=0;
     end
-    
     
     % Number of examples wanted
     it = instancesWanted;
     
     carray = [];warray = []; garray = [];count=0;
 
-    S = symplecticform(N);
+    S = symplecticform(modesWanted);
     
     %format tree name for printing
     tree = strjoin(string(tree));
@@ -27,23 +34,18 @@ function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted
     % Fill in the arrays with the covariance matrices, witnesses and
     % expectation values. 
     while (it > 0)
-        % The warning messages are used for detecting errors appearing when
-        % solving the SDP's. There is probably a better way - if you know
-        % it then please let me know. 
-        lastwarn("");   %sets last warning to empty
-
                
         % Check that the produced CM is a quantum CM, up to numerical error.
         check = true;
         while check
-            randomCM = rndgaussiancmnoxpcorrelations(N);
+            randomCM = rndgaussiancmnoxpcorrelations(modesWanted);
             if isCM(randomCM)
-                [c, W, gamma, ~] = findggme(randomCM, N, only_partial_knowlege, trials, blindfold, tree, maxTrials); %automate trials
+                [c, W, gamma] = findggme(randomCM, modesWanted, only_partial_knowledge, trials, blindfold, tree); %automate trials
                 check = false;
             end
         end
         
-        % Choose runs with valid output matrices and that are linked to an
+        % Choose runs with valid output matrices that are linked to an
         % entangled state. 
                                      
             if ( c < 0 ) %includes all conditions for a valid output as checked in findggme. These could be too strong, as tolerances are very small

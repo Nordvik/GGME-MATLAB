@@ -9,11 +9,11 @@ tree = strjoin(string(adjList));
 
 %set parameters if unset
 if nargin < 4
-    instancesToOutput = 5;
+    instancesToOutput = 20;
 end
 
 if nargin < 3
-    instancesToProcess = 20;
+    instancesToProcess = 10;
 end
 
 
@@ -39,7 +39,7 @@ end
 improved = repelem(false, instancesToProcess); %log if an improvement is made
 blindfold = getBlindness(N, adjList); %get blindfold
 for i=1:instancesToProcess
-    [c, W, CM] = findggme(CMarray(:,:,i), N, true, 30, blindfold, tree, 30);
+    [c, W, CM] = findggme(CMarray(:,:,i), N, true, 25, blindfold, tree);
     if c < Clist(i)
         improved(i) = true;
         %add new improved instance to arrays
@@ -55,7 +55,7 @@ outputindexes = repelem(0,instancesToOutput);
 tempClist = Clist;
 bestCMs=[]; bestWs=[]; bestCs=[];
 for i=1:instancesToOutput
-    [~,outputindexes(i)] = min(Clist);
+    [~,outputindexes(i)] = min(tempClist);
     bestCMs = cat(3,bestCMs,CMarray(:,:,outputindexes(i)));
     bestWs = cat(3,bestWs,Warray(:,:,outputindexes(i))); 
     bestCs = [bestCs, Clist(outputindexes(i))];

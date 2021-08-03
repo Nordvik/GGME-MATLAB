@@ -1,13 +1,13 @@
 % Run step one and two in one go
-function [ c_out, W_opt, g_opt, witness_output] = findggme(g, N, only_partial_knowledge, trials, blindfold, tree, maxTrials)
+function [ c_opt, W_opt, CM_opt] = findggme(CM, N, only_partial_knowledge, trials, blindfold, tree)
 
   iter = trials;
-  erroroutput = "";
+  erroroutput = "";   %for checking if errors occur in solver
   trialsArray = [];   %for checking optimal trials
+  maxTrials = 50;
   
-  %initialise arrays for saving witnesses, CMs and witness means
+  %initialise arrays for saving witnesses and witness means
   W = [];
-  CM = g;
   c= [];
   
   count = 0;
@@ -30,7 +30,7 @@ function [ c_out, W_opt, g_opt, witness_output] = findggme(g, N, only_partial_kn
       trialsArray = cat(2,trialsArray,[0; c(count*2-1)]);
       
       %Exclude from results if c <= -1: there must have been an error
-        if round(c(2*count - 1),2) <= -1
+        if round(c(2*count - 1),4) <= -1
             c(2*count - 1) = 0;
         end
         
@@ -42,7 +42,7 @@ function [ c_out, W_opt, g_opt, witness_output] = findggme(g, N, only_partial_kn
       end 
         
        %Get and save CM and witness mean to array 
-      [ c(2*count), ~, CM(:,:,count+1), CM_output ] = findOptimalCM(W(:,:,count));
+      [ c(2*count), CM(:,:,count+1), CM_output ] = findOptimalCM(W(:,:,count));
      
       
       %print out identifiers for various events to optimalTrials. If there is no problem
@@ -76,11 +76,6 @@ function [ c_out, W_opt, g_opt, witness_output] = findggme(g, N, only_partial_kn
           erroroutpput = strcat("Fatal error on trial ", string(trials - iter));
           break
       end 
-     
-    %  %Exit loop and get new random CM if error
-    %  if not(lastwarn == "")
-    %      break
-    %  end
       
   end
   
@@ -97,23 +92,18 @@ function [ c_out, W_opt, g_opt, witness_output] = findggme(g, N, only_partial_kn
  end
  
  %Determine optimal CM-Witness pair from those produced
- 
- if not(isempty(hasSeparableMarginals(g)))
-     c(1) = 0; %cannot use first CM if it does not have all two-mode marginals seperable
- end
- 
- [c_out, index]= min(c);
+ [c_opt, index]= min(c);
  W_opt = W(:,:,ceil(index/2));
- g_opt = CM(:,:,floor(index/2+1));
+ CM_opt = CM(:,:,floor(index/2+1));
  
  %only select matrices if they are valid
- while not(isWitness(W_opt) && isCM(g_opt))
-     c(index) = 1;
-     [c_out, index]= min(c);
+ while not(isWitness(W_opt) && isCM(CM_opt) && isempty(hasInseparableMarginals(CM_opt)))
+     c(index) = 1; %exclude from selection
+     [c_opt, index]= min(c); %get next best instance
      W_opt = W(:,:,ceil(index/2));
-     g_opt = CM(:,:,floor(index/2+1));
+     CM_opt = CM(:,:,floor(index/2+1));
      
-     if c(index) == 1
+     if c(index) == 1 %if no instances are valid
          break
      end
  end

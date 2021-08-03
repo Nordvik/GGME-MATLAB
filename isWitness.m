@@ -75,14 +75,16 @@ x = x & A6;
 
 if not(x)
     if not(A4)
-        "Condition A.4 failed. Witness not positive semidefinite."
+        warning("Condition A.4 failed. Witness not positive semidefinite.")
     end
     if not(A5)
-        "Condition A.5 failed. Symplectic traces over bipartitions do not sum >= 1/2 for all bipartitions"
+        warning("Condition A.5 failed. Symplectic traces over bipartitions do not sum >= 1/2 for all bipartitions.")
     end
     if not(A6)
-        "Condition A.6 failed. Symplectic trace of witness not < 1/2."
+        warning("Condition A.6 failed. Symplectic trace of witness not < 1/2.")
     end
+else
+    disp("Witness is valid.")
 end
 
 end
