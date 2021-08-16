@@ -1,6 +1,6 @@
 function x = isWitness(W)
-%Checks if a matrix W is a linear entanglement witnesses based on second
-%moments that can detect only GME states as per apprendix of hyllus44
+%Checks if a matrix W is a linear entanglement witness based on second
+%moments that can detect only GME states as per apprendix of hyllus
 
 %check input is valid%%%%%%%%%%%
 [n, m] = size(W);
@@ -17,18 +17,18 @@ N = length(W)/2;
 
 %CHECK CONDITION A.4
     A4 = isPSD(W);
+    x = A4;
 
 %CHECK CONDITION A.5
     %there are K = N choose 2 ways of bipartitioning the system
     K = 2^(N - 1) - 1;
-
-    %initialise condition statement
-    A5 = true;
     
+    
+    A5 = true;   
     for i = 1:K %for each way of bipartitioning
-        if A5 
+        if x 
             %create lists of logical values where each element is whether
-            %that index is a mode in partiton 1/2
+            %that index is a mode in partiton 1
             inPartition1 = dec2bin(i,N);
 
             %construct  list of modes in each partition
@@ -40,18 +40,19 @@ N = length(W)/2;
             submat2 = RemoveMode(W,part1);
                 
             %Find symplectic eigenvalues for submatrices
-            sympEigs1 = eig(sqrtm(submat1)*1i*symp(length(submat1)/2)*sqrtm(submat1));
-            sympEigs2 = eig(sqrtm(submat2)*1i*symp(length(submat2)/2)*sqrtm(submat2));
+            sympEigs1 = abs(eig(1i*symp(length(submat1)/2)*submat1));
+            sympEigs2 = abs(eig(1i*symp(length(submat2)/2)*submat2));
                 
             %get numerical errors
             precision1 = sum(eps(sympEigs1));
             precision2 = sum(eps(sympEigs2));
                 
             %Evaluate the symplectic trace over the subsystems and check if >= 1/2.
-            %Symplectic eigenvalues each appear twice each in in the
+            %Symplectic eigenvalues each appear twice each in the
             %above lists, so actually check if the sum is >=1 to
             %numerical error and update condition
-            A5 = A5 & (sum(sympEigs1) + sum(sympEigs2) >= 1 - precision1 - precision2);     
+            A5 = A5 & (sum(sympEigs1) + sum(sympEigs2) >= 1 - precision1 - precision2); 
+            x = x & A5;
         end
     end
     
@@ -61,7 +62,7 @@ N = length(W)/2;
     omega = symp(N);
     
     %Calculate symplectic eigenvalues
-    sympEigs = eig(sqrtm(W)*1i*omega*sqrtm(W));
+    sympEigs = abs(eig(1i*omega*W));
     
     %calculate precision
     precision = sum(eps(sympEigs));
@@ -70,18 +71,20 @@ N = length(W)/2;
     A6 = sum(sympEigs) < 1 - precision;
     
 %OUTPUT
-x = A4 & A5 & A6;
+x = x & A6;
 
 if not(x)
     if not(A4)
-        "Condition A.4 failed. Witness not positive semidefinite."
+        warning("Condition A.4 failed. Witness not positive semidefinite.")
     end
     if not(A5)
-        "Condition A.5 failed. Symplectic traces over bipartitions do not sum >= 1/2 for all bipartitions"
+        warning("Condition A.5 failed. Symplectic traces over bipartitions do not sum >= 1/2 for all bipartitions.")
     end
     if not(A6)
-        "Condition A.6 failed. Symplectic trace of witness not < 1/2."
+        warning("Condition A.6 failed. Symplectic trace of witness not < 1/2.")
     end
+else
+    disp("Witness is valid.")
 end
 
 end

@@ -1,25 +1,32 @@
-function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted,N,trials, maxTrials)
+function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted,modesWanted,trials, adjList)
   
     bootstrap;
 
-    %Use additional constraints on witness
-    only_partial_knowlege = true;
+    if nargin <4 %if adjList unset
+        adjList = [];
+    end
     
-    if only_partial_knowlege
+    if nargin < 3 %if trials unset
+        trials = 10; %default value
+    end
+
+    %Use additional constraints on witness
+    only_partial_knowledge = true;
+    
+    if only_partial_knowledge
         %Get blindness tree from user and generate blindness condition on
         %witness
-        [blindfold, tree] = getBlindness(N);
+        [blindfold, tree] = getBlindness(modesWanted, adjList);
     else
         blindfold=1;tree=0;
     end
-    
     
     % Number of examples wanted
     it = instancesWanted;
     
     carray = [];warray = []; garray = [];count=0;
 
-    S = symplecticform(N);
+    S = symplecticform(modesWanted);
     
     %format tree name for printing
     tree = strjoin(string(tree));
@@ -27,27 +34,21 @@ function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted
     % Fill in the arrays with the covariance matrices, witnesses and
     % expectation values. 
     while (it > 0)
-        % The warning messages are used for detecting errors appearing when
-        % solving the SDP's. There is probably a better way - if you know
-        % it then please let me know. 
-        lastwarn("");   %sets last warning to empty
-
-        randomCM = rndgaussiancmnoxpcorrelations(N); %save this for reference (output it)
-        
-        % Check that the produced CM is symplectic, up to numerical error.
-        errorlevel = floor(-log10(eps(max(max(randomCM)))));
-         
-        if (round(randomCM*S*randomCM'-S,errorlevel) == zeros(2*N))
-            [c, W, gamma, status] = findggme(randomCM, N, only_partial_knowlege, trials, blindfold, tree, maxTrials); %automate trials
+               
+        % Check that the produced CM is a quantum CM, up to numerical error.
+        check = true;
+        while check
+            randomCM = rndgaussiancmnoxpcorrelations(modesWanted);
+            if isCM(randomCM)
+                [c, W, gamma] = findggme(randomCM, modesWanted, only_partial_knowledge, trials, blindfold, tree); %automate trials
+                check = false;
+            end
         end
         
-        % Choose error-free runs and those CM's that are linked to an
-        % entangled state. The first criterion might be too strict as there
-        % are cases when there are error warnings but the (cm, witness)
-        % pair satisfies our requirements. 
-  %      if (lastwarn == "" && c < 0) 
+        % Choose runs with valid output matrices that are linked to an
+        % entangled state. 
                                      
-            if ( c < 0) 
+            if ( c < 0 ) %includes all conditions for a valid output as checked in findggme. These could be too strong, as tolerances are very small
                 it = it - 1;
                 if isempty(carray) % first spotting
                     carray = c;
@@ -65,7 +66,7 @@ function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted
             end
         end
     end
-%end
+
 
 %%
 %%%--------------------------------------------------------------------%%%
@@ -78,12 +79,14 @@ function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted
 function cm = rndgaussiancmnoxpcorrelations(N)
 
         T = orderingconversion(N);
-        S = symplecticform(N);
+        %create random diagonal matrix (max element 15)
+        D = diag(randi(15,N,1));
+
         randommatrix = randn(N);
         
         % This gives a covariance matrix in the 
         %(x1,x2,...,p1,p2,...) ordering
-        thismat = blkdiag(randommatrix*eye(N)*randommatrix',(randommatrix')^(-1)*eye(N)*randommatrix^(-1));
+        thismat = blkdiag(randommatrix*D*randommatrix',(randommatrix')^(-1)*D*randommatrix^(-1));
        
         % Convert to the wanted ordering
         cm = T'*thismat*T;

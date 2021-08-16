@@ -1,4 +1,4 @@
-function [blindfold, adjList] = getBlindness(N)
+function [blindfold, adjList] = getBlindness(N, adjList)
 %Takes number of modes as input, requests blindness tree from user and
 %outputs blindness conditions on witness
 
@@ -6,13 +6,19 @@ function [blindfold, adjList] = getBlindness(N)
         error('Expects 3 modes or more.')
     end
     
-    if N==3 %automatically set blindness tree to only option for N=3
-        adjList=[0 1 2];
-        adjMat=[1 1 0; 1 1 1; 0 1 1];
-        
-    else %get blindness tree from user
-        adjList= input('Input adjacency list of blindness tree (vector of length N with each element \nin the vector the index of its parent in the tree, e.g. for 3 modes [0 1 2]):   \n');
+    if nargin < 2 %if adjList unset
+        adjList = [];
+    end
     
+    if N==3 %automatically set blindness tree to only option for N=3
+        adjList=[0 1 2];     
+    else
+        %get blindness tree from user if not input at start
+        if isempty(adjList)
+            adjList= input('Input adjacency list of blindness tree (vector of length N with each element \nin the vector the index of its parent in the tree, e.g. for 3 modes [0 1 2]):   \n');
+        end
+    end
+        
         if not(length(adjList)==N) 
             error('Adjacency list should have same length as number of modes.')
         end
@@ -30,7 +36,7 @@ function [blindfold, adjList] = getBlindness(N)
                 adjMat(adjList(i),i)= 1;
             end
         end
-    end
+    
     
     adjMat=logical(adjMat);
     

@@ -1,7 +1,8 @@
-function [witvalue, witmatrix, state] = findOptimalWitness(G, N, blindfold)
+function [c, witmatrix, state] = findOptimalWitness(CM, N, blindfold)
 %Takes covariance matrix, number of modes and blindness conditions, outputs 
 %optimal witness and expectation value of witness applied to covariance matrix
-
+yalmip('clear')
+tolerance  = 5e-9;
 % Construct the symplectic sigma form.
   
   S = sigma(N);
@@ -55,8 +56,8 @@ function [witvalue, witmatrix, state] = findOptimalWitness(G, N, blindfold)
   % U must be positive definite
   % V must be positive definite
   % W must be positive definite to be a Witness
-  
-  F = [ U >= 0, V >= 0, W >= 0 ];
+
+  F = [ U >= 0, V >= 0, (W >= tolerance*eye(2*N))];
   
   % Construct the constraints!
   %
@@ -129,12 +130,12 @@ function [witvalue, witmatrix, state] = findOptimalWitness(G, N, blindfold)
     % Construct the 2nd constraint from (H.44)!
     
     F = [ F, trace(1i * S * Y) + U - V + Z == 0 ];
-    
+        
   end
   
   % Construct the objective, X per (H.44).
   
-  X = (trace(G * real(W)) - 1);
+  X = (trace(CM * real(W)) - 1);
   
   % Minimize using the MOSEK solver.
   
@@ -143,12 +144,15 @@ function [witvalue, witmatrix, state] = findOptimalWitness(G, N, blindfold)
   
   % Yield the information.
   
-  witvalue  = double(X);
+  c  = double(X);
   witmatrix = real(double(W));
   state     = S;
+
   
-  % Print out a warning if neccessary?
-  
+  % Check if constraints are met
+  %check(F)
+
+  %Print warning if there is a problem
   if not(S.problem == 0)
     warning(S.info)
   end
