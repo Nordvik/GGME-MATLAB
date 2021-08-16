@@ -51,7 +51,7 @@ N = length(W)/2;
             %Symplectic eigenvalues each appear twice each in the
             %above lists, so actually check if the sum is >=1 to
             %numerical error and update condition
-            A5 = A5 & (sum(sympEigs1) + sum(sympEigs2) >= 1 - precision1 - precision2); 
+            A5 = A5 & (sum(sympEigs1) + sum(sympEigs2) >= 1 - precision1 - precision2);
             x = x & A5;
         end
     end

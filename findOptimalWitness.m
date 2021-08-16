@@ -2,7 +2,7 @@ function [c, witmatrix, state] = findOptimalWitness(CM, N, blindfold)
 %Takes covariance matrix, number of modes and blindness conditions, outputs 
 %optimal witness and expectation value of witness applied to covariance matrix
 yalmip('clear')
-tolerance  = 5e-9;
+tolerance  = 5e-8;
 % Construct the symplectic sigma form.
   
   S = sigma(N);
@@ -57,7 +57,7 @@ tolerance  = 5e-9;
   % V must be positive definite
   % W must be positive definite to be a Witness
 
-  F = [ U >= 0, V >= 0, (W >= tolerance*eye(2*N))];
+  F = [ U >= tolerance*eye(2*N), V >= tolerance*eye(2*N), (W >= tolerance*eye(2*N))];
   
   % Construct the constraints!
   %
