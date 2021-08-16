@@ -1,6 +1,8 @@
 % Run step one and two in one go
 function [ c_opt, W_opt, CM_opt] = findggme(CM, N, only_partial_knowledge, trials, blindfold, tree)
 
+ rounding = 10; %number of decimal places to check 'rounding resiliance' to
+
   iter = trials;
   erroroutput = "";   %for checking if errors occur in solver
   trialsArray = [];   %for checking optimal trials
@@ -97,13 +99,14 @@ function [ c_opt, W_opt, CM_opt] = findggme(CM, N, only_partial_knowledge, trial
  CM_opt = CM(:,:,floor(index/2+1));
  
  %only select matrices if they are valid
- while not(isWitness(W_opt) && isCM(CM_opt) && isempty(hasInseparableMarginals(CM_opt)))
+ while not(isWitness(W_opt) && isCM(CM_opt) && isempty(hasInseparableMarginals(CM_opt)) && all(diag(CM_opt) <= 10) && all(diag(CM_opt) >= 1) && min(eig(CM_opt)) > 0.2)
      c(index) = 1; %exclude from selection
      [c_opt, index]= min(c); %get next best instance
      W_opt = W(:,:,ceil(index/2));
      CM_opt = CM(:,:,floor(index/2+1));
      
      if c(index) == 1 %if no instances are valid
+         warning("No valid instance produced from this seed")
          break
      end
  end

@@ -13,7 +13,10 @@
 % 1. be a quantum covariance matrix
 % 2. have all marginals separable
 % 3. have no x-p correlations (end of section 1 in document by Lada)
-%(4. correspond to a pure state -- NOT IMPLEMENTED)
+% 4. have no diagonal elements greater than the specified maxElem or less
+% than the specified minElem
+% 5. have no eigenvalues less than or equal to the specified minEig
+%(6. correspond to a pure state -- NOT IMPLEMENTED)
 %
 %
 % Log: 2019-12-11
@@ -29,6 +32,15 @@ yalmip('clear')
   else
       N = length(W)/2;
   end
+  
+  % Set maximum and minimum diagonal element size.
+  
+  maxElem = 10;
+  minElem = 1;
+  
+  %Set minimum eigenvalue size
+  
+  minEig = 0.2;
 
   % Construct the symplectic form in the (x1,p2,x2,p2,...) ordering.
   
@@ -94,13 +106,25 @@ yalmip('clear')
           end
       end
   end
- 
- % *NOTE*
+  
+   % *NOTE*
  % It seems that the inclusion of these constraints are not necessary as
  % all output covariance matrices don't have x-p correlations - up to
  % numerical noise. However, we should check whether they remove too many
  % potential solutions as even when the outputs are rounded (say to 0(-10))
  % they are still acceptable solutions. 
+  
+  
+ % 4. All diagonal elements of G should be less than the maximum element size 
+ % and greater than the minimum element size specified above.
+ 
+ F = [F, max(diag(G)) <= maxElem,  min(diag(G)) >= minElem];
+ 
+ 
+ % 5. The smallest eigenvalue of G should be greater than the minimum eigenvalue specified above (greater than or equal to minEig + 10^(-9)).
+ 
+ F = [F, G >= minEig + 10^-9];
+ 
                    %------------0------------%  
                    
   % Next we add the constraint of purity:
@@ -132,15 +156,12 @@ yalmip('clear')
  % Outputs
  %-----------------------------------------------------------------------%
   
-  c   = double(X);
+  c  = double(X);
   witness = real(double(W));
   CM   = double(G);
   output = S;
   
   % Print out a warning if neccessary. 
-  %
-  % The warning messages are used in the two-step procedure to filter out 
-  % unwanted results
   
   lastwarn("");
   if not(S.problem == 0)
