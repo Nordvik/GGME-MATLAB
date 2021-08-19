@@ -1,6 +1,18 @@
-function x = isWitness(W)
+function x = isWitness(W,silence)
 %Checks if a matrix W is a linear entanglement witness based on second
 %moments that can detect only GME states as per apprendix of hyllus
+
+if nargin <2 % Input required to post messages
+    silent = true;
+else
+    if islogical(silence)
+        silent = silence;  
+    else
+        disp('Second argument must be a boolean. Messages have been disabled.')
+        silent = true;
+    end
+end
+
 
 %check input is valid%%%%%%%%%%%
 [n, m] = size(W);
@@ -73,18 +85,22 @@ N = length(W)/2;
 %OUTPUT
 x = x & A6;
 
-if not(x)
-    if not(A4)
-        warning("Condition A.4 failed. Witness not positive semidefinite.")
-    end
-    if not(A5)
-        warning("Condition A.5 failed. Symplectic traces over bipartitions do not sum >= 1/2 for all bipartitions.")
-    end
-    if not(A6)
-        warning("Condition A.6 failed. Symplectic trace of witness not < 1/2.")
-    end
+if silent
+    % Don't output message
 else
-    disp("Witness is valid.")
+    if not(x)
+        if not(A4)
+            warning("Condition A.4 failed. Witness not positive semidefinite.")
+        end
+        if not(A5)
+            warning("Condition A.5 failed. Symplectic traces over bipartitions do not sum >= 1/2 for all bipartitions.")
+        end
+        if not(A6)
+            warning("Condition A.6 failed. Symplectic trace of witness not < 1/2.")
+        end
+    else
+        disp("Witness is valid.")
+    end
 end
 
 end

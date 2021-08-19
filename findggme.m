@@ -1,6 +1,8 @@
 % Run step one and two in one go
 function [ c_opt, W_opt, CM_opt] = findggme(CM, N, only_partial_knowledge, trials, blindfold, tree)
 
+ write2file = false;
+
  rounding = 10; %number of decimal places to check 'rounding resiliance' to
 
   iter = trials;
@@ -81,18 +83,21 @@ function [ c_opt, W_opt, CM_opt] = findggme(CM, N, only_partial_knowledge, trial
       
   end
   
- %write evolution of witness expectation value with number of trials to
- %file
- trialsArray = cat(2,trialsArray,[repelem(NaN,2*maxTrials-length(trialsArray));repelem(NaN,2*maxTrials-length(trialsArray))]);
- writematrix(trialsArray,strcat('OutputMatrices\optimalTrials\',string(N),'modes','\',tree,'.xls'),'WriteMode','append');
- 
- %Write error message to file if quitting early
- if not(erroroutput == "")
-     errorString = repelem("",2*maxTrials);
-     errorString(1)= erroroutput;
-     writematrix(errorString,strcat('OutputMatrices\optimalTrials\',string(N),'modes','\',tree,'.xls'),'WriteMode','append');
- end
- 
+  if write2file
+  
+     %write evolution of witness expectation value with number of trials to
+     %file
+     trialsArray = cat(2,trialsArray,[repelem(NaN,2*maxTrials-length(trialsArray));repelem(NaN,2*maxTrials-length(trialsArray))]);
+     writematrix(trialsArray,strcat('OutputMatrices\optimalTrials\',string(N),'modes','\',tree,'.xls'),'WriteMode','append');
+
+     %Write error message to file if quitting early
+     if not(erroroutput == "")
+         errorString = repelem("",2*maxTrials);
+         errorString(1)= erroroutput;
+         writematrix(errorString,strcat('OutputMatrices\optimalTrials\',string(N),'modes','\',tree,'.xls'),'WriteMode','append');
+     end
+  end %end of writing to file 
+  
  %Determine optimal CM-Witness pair from those produced
  [c_opt, index]= min(c);
  W_opt = W(:,:,ceil(index/2));

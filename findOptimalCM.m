@@ -126,13 +126,18 @@ yalmip('clear')
  F = [F, G >= minEig + 10^-9];
  
                    %------------0------------%  
-                   
+                  
+
   % Next we add the constraint of purity:
   % NOT SUITABLE FOR SOLVING WITH THE SOLVERS TRIED
   % Equivalent statements:
-  % F = [ F, (OMG*G)*(OMG*G) + eye(D) == 0 ];   % Solver not applicable
-  % F = [ F, norm(G) == 1];                     % "Model creation failed"
-  % F = [ F, 1/(sqrt(det(G))) == 1 ];           % "Model creation failed"
+  % F = [ F, (OMG*G)*(OMG*G) + eye(D) >= (0 - 10^-9)*eye(D) ];   % Solver not applicable
+  % F = [ F, (OMG*G)*(OMG*G) + eye(D) <= (0 + 10^-9)*eye(D) ];   % Solver not applicable
+  % F = [ F, norm(G) >= 1 - 10^-9];                     % "Model creation failed"
+  % F = [ F, norm(G) <= 1 + 10^-9];                     % "Model creation failed"
+  % F = [ F, 1/(sqrt(det(G))) >= 1- 10^-9 ];            % "Model creation failed"
+  % F = [ F, 1/(sqrt(det(G))) <= 1+ 10^-9 ]
+  % F = [F, eig(1i*OMG*G) <= -1 + 10^-9, eig(1i*OMG*G) >= -1 - 10^-9];
   
   % Question: 
   %     Is this because the constraint is not linear in G?

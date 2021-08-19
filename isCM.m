@@ -1,5 +1,16 @@
-function x = isCM(M)
+function x = isCM(M,silence)
 %Checks if M is a valid quantum covariance matrix, i.e.
+
+if nargin <2 % Input required to post messages
+    silent = true;
+else
+    if islogical(silence)
+        silent = silence;  
+    else
+        disp('Second argument must be a boolean. Messages have been disabled.')
+        silent = true;
+    end
+end
 
 %check input is valid%%%%%%%%%%%
 [n, m] = size(M);
@@ -17,10 +28,13 @@ S = symp(N);
 
 x = isPSD(M + 1i*S);
 
-if not(x)
-    warning("CM does not satisfy the Heisenberg uncertainty principle.")
+if silent
 else
-    disp("CM is valid.")
+    if not(x)
+        warning("CM does not satisfy the Heisenberg uncertainty principle.")
+    else
+        disp("CM is valid.")
+    end
 end
 end
 

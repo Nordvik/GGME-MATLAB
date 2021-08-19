@@ -2,6 +2,8 @@ function [blindfold, adjList] = getBlindness(N, adjList)
 %Takes number of modes as input, requests blindness tree from user and
 %outputs blindness conditions on witness
 
+    plotTree = true;
+
     if N<3 
         error('Expects 3 modes or more.')
     end
@@ -25,7 +27,9 @@ function [blindfold, adjList] = getBlindness(N, adjList)
 
         %Plot schematic of witness tree, return error if adjList does not
         %correspond to a tree
-        treeplot(adjList)
+        if plotTree
+            treeplot(adjList)
+        end
     
 
         %Calculate adjacency matrix from list
