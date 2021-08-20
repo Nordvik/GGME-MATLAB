@@ -3,6 +3,7 @@ alterations/**
 lib/**
 outputs/**
 obsolete/**
+MoreModes_temp/**
 
 # Windows default autosave extension
 *.asv

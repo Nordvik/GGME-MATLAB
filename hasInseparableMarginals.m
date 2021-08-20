@@ -2,6 +2,7 @@ function notSepMarginalsArray = hasInseparableMarginals(CM)
 % Function to check whether all marginals, of A, are separable 
 
 boolDisplayMessages = false;
+boolDisplayMinEigval = false;   
 
 % checking that dimensions are alright
 [n, m] = size(CM);
@@ -34,11 +35,16 @@ for i = 1:N
     arrModeList(i) = i;
 end
 
+arrMinEig=[];
+
 for i = 1:N
     for j = i+1:N
         arrModesToRemove = setdiff(arrModeList,[i,j]); % Remove all but two modes
         submat = RemoveMode(CM,arrModesToRemove);
-    
+        
+        mineig = min(abs(eig(L1*submat*transpose(L1) + 1i*omg)));
+        arrMinEig = [arrMinEig,mineig];
+        
         ppt1 = isPositiveDefinite(L1*submat*transpose(L1) + 1i*omg);  
         ppt2 = isPositiveDefinite(L2*submat*transpose(L2) + 1i*omg);
         
@@ -56,7 +62,9 @@ for i = 1:N
         end
     end
 end
-
+if boolDisplayMinEigval
+    min(arrMinEig)
+end
 end
 
 %%
