@@ -150,7 +150,7 @@ tolerance  = 5e-8;
 
   
   % Check if constraints are met
-  %check(F)
+  check(F)
 
   %Print warning if there is a problem
   if not(S.problem == 0)

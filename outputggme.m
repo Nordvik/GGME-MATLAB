@@ -9,7 +9,7 @@ if nargin < 3 %if trials unset
     trials = 10; %default value
 end
 
-[carray, warray, garray, seedarray, tree] = produceggme(instancesWanted,modesWanted,trials,adjList);
+[carray, warray, garray, seedarray, timearray, tree] = produceggme(instancesWanted,modesWanted,trials,adjList);
     N = modesWanted;
     time=datestr(datetime, 'dd-mmmm-yyyy HH.MM.ss');
 
@@ -21,7 +21,7 @@ end
     
     %Print data to output file
     
-    save(strcat('OutputMatrices\',string(N),'modes\',tree,'\',time,'.mat'),'warray', 'garray','carray','seedarray');
+    save(strcat('OutputMatrices\',string(N),'modes\',tree,'\',time,'.mat'),'warray', 'garray','carray', 'timearray','seedarray');
     
     
     %write timestamp and number of instances to optimalTrials file

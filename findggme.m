@@ -1,6 +1,8 @@
 % Run step one and two in one go
-function [ c_opt, W_opt, CM_opt] = findggme(CM, N, only_partial_knowledge, trials, blindfold, tree)
+function [ c_opt, W_opt, CM_opt, runtime] = findggme(CM, N, only_partial_knowledge, trials, blindfold, tree)
 
+ tic %start timer
+ 
  rounding = 10; %number of decimal places to check 'rounding resiliance' to
 
   iter = trials;
@@ -111,5 +113,6 @@ function [ c_opt, W_opt, CM_opt] = findggme(CM, N, only_partial_knowledge, trial
      end
  end
  
+ runtime = toc; %get runtime
   
 end

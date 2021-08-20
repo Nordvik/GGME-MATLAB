@@ -1,4 +1,4 @@
-function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted,modesWanted,trials, adjList)
+function [carray, warray, garray, seedarray, timearray, tree] = produceggme(instancesWanted,modesWanted,trials, adjList)
   
     bootstrap;
 
@@ -40,7 +40,7 @@ function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted
         while check
             randomCM = rndgaussiancmnoxpcorrelations(modesWanted);
             if isCM(randomCM)
-                [c, W, gamma] = findggme(randomCM, modesWanted, only_partial_knowledge, trials, blindfold, tree); %automate trials
+                [c, W, gamma, runtime] = findggme(randomCM, modesWanted, only_partial_knowledge, trials, blindfold, tree); %automate trials
                 check = false;
             end
         end
@@ -54,6 +54,7 @@ function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted
                     carray = c;
                     warray = W;
                     garray = gamma;
+                    timearray = runtime;
                     seedarray = randomCM;
                     count = 1;
                 else
@@ -61,6 +62,7 @@ function [carray, warray, garray, seedarray, tree] = produceggme(instancesWanted
                     carray = [carray, c];
                     warray = cat(3,warray,W);
                     garray = cat(3,garray,gamma); 
+                    timearray = [timearray, runtime];
                     seedarray = cat(3,seedarray,randomCM);
                 end
             end
